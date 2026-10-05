@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "donor_name": "Sarah Lee",
+    "email": "sarah.lee@example.com",
+    "amount": 250,
+    "campaign": "Education Support",
+    "donation_date": "2026-09-14",
+    "payment_method": "Card"
+  },
+  {
+    "id": 2,
+    "donor_name": "Michael Chen",
+    "email": "michael.chen@example.com",
+    "amount": 500,
+    "campaign": "Healthcare Initiative",
+    "donation_date": "2026-09-21",
+    "payment_method": "Bank Transfer"
+  },
+  {
+    "id": 3,
+    "donor_name": "Aisha Patel",
+    "email": "aisha.patel@example.com",
+    "amount": 120,
+    "campaign": "General Fund",
+    "donation_date": "2026-10-01",
+    "payment_method": "Mobile Wallet"
+  }
+]

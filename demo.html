@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donation Management System</title>
+    <style>
+      :root {
+        --bg: #f3f7fb;
+        --panel: #ffffff;
+        --primary: #2b6cb0;
+        --primary-dark: #1f4e79;
+        --accent: #28a745;
+        --warning: #e67e22;
+        --danger: #d9534f;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #dfe7f1;
+        --shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(135deg, #eef5ff, #f8fbff);
+        color: var(--text);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 32px auto;
+        padding: 20px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+      }
+
+      .badge {
+        display: inline-block;
+        background: rgba(43, 108, 176, 0.1);
+        padding: 8px 14px;
+        border-radius: 999px;
+        color: var(--primary-dark);
+        font-weight: 700;
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+        margin-bottom: 28px;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 20px;
+      }
+
+      .stat-label {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+      }
+
+      .stat-value {
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: 24px;
+      }
+
+      @media (max-width: 900px) {
+        .main-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      form {
+        display: grid;
+        gap: 14px;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+
+      label {
+        font-size: 0.9rem;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      input, select, button {
+        font: inherit;
+      }
+
+      input, select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+        color: var(--text);
+      }
+
+      input:focus, select:focus {
+        outline: 2px solid rgba(43, 108, 176, 0.15);
+        border-color: var(--primary);
+      }
+
+      .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        font-weight: 700;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+
+      .btn-danger {
+        background: var(--danger);
+        color: white;
+      }
+
+      .controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin: 18px 0;
+      }
+
+      .search-box {
+        flex: 1;
+        min-width: 220px;
+      }
+
+      .table-wrap {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th, td {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+      }
+
+      th {
+        background: #f8fbff;
+        color: var(--primary-dark);
+        font-size: 0.82rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      td {
+        font-size: 0.96rem;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .pill.success {
+        background: rgba(40, 167, 69, 0.12);
+        color: #1d6f35;
+      }
+
+      .pill.warning {
+        background: rgba(230, 126, 34, 0.12);
+        color: #9b4f0d;
+      }
+
+      .action {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        color: var(--danger);
+        font-weight: 700;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 30px 16px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>Donation Management System</h1>
+        <span class="badge">Live Overview</span>
+      </header>
+
+      <section class="dashboard">
+        <div class="card">
+          <div class="stat-label">Total Donations</div>
+          <p id="totalAmount" class="stat-value">$0.00</p>
+        </div>
+        <div class="card">
+          <div class="stat-label">Donors</div>
+          <p id="donorCount" class="stat-value">0</p>
+        </div>
+        <div class="card">
+          <div class="stat-label">This Month</div>
+          <p id="monthlyAmount" class="stat-value">$0.00</p>
+        </div>
+        <div class="card">
+          <div class="stat-label">Largest Gift</div>
+          <p id="largestGift" class="stat-value">$0.00</p>
+        </div>
+      </section>
+
+      <section class="main-grid">
+        <div class="card">
+          <h2 style="margin-top:0;">Add Donation</h2>
+          <form id="donationForm">
+            <div class="field">
+              <label for="donorName">Donor Name</label>
+              <input id="donorName" name="donorName" type="text" placeholder="Enter donor name" required />
+            </div>
+
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" placeholder="donor@example.com" required />
+            </div>
+
+            <div class="field">
+              <label for="amount">Amount</label>
+              <input id="amount" name="amount" type="number" min="1" step="0.01" placeholder="0.00" required />
+            </div>
+
+            <div class="field">
+              <label for="campaign">Campaign</label>
+              <select id="campaign" name="campaign">
+                <option value="General Fund">General Fund</option>
+                <option value="Education Support">Education Support</option>
+                <option value="Healthcare Initiative">Healthcare Initiative</option>
+                <option value="Disaster Relief">Disaster Relief</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="donationDate">Donation Date</label>
+              <input id="donationDate" name="donationDate" type="date" required />
+            </div>
+
+            <div class="field">
+              <label for="paymentMethod">Payment Method</label>
+              <select id="paymentMethod" name="paymentMethod">
+                <option value="Card">Card</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Cash">Cash</option>
+                <option value="Mobile Wallet">Mobile Wallet</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Donation</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2 style="margin-top:0;">Donation Records</h2>
+
+          <div class="controls">
+            <div class="search-box">
+              <input id="searchInput" type="text" placeholder="Search donor or campaign" />
+            </div>
+            <select id="campaignFilter">
+              <option value="All">All Campaigns</option>
+              <option value="General Fund">General Fund</option>
+              <option value="Education Support">Education Support</option>
+              <option value="Healthcare Initiative">Healthcare Initiative</option>
+              <option value="Disaster Relief">Disaster Relief</option>
+            </select>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Donor</th>
+                  <th>Campaign</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                  <th>Method</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="donationTableBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state" hidden>No donations found.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const storageKey = 'donationManagementSystem';
+      const defaultDonations = [
+        { id: 1, donorName: 'Sarah Lee', email: 'sarah.lee@example.com', amount: 250, campaign: 'Education Support', donationDate: '2026-09-14', paymentMethod: 'Card' },
+        { id: 2, donorName: 'Michael Chen', email: 'michael.chen@example.com', amount: 500, campaign: 'Healthcare Initiative', donationDate: '2026-09-21', paymentMethod: 'Bank Transfer' },
+        { id: 3, donorName: 'Aisha Patel', email: 'aisha.patel@example.com', amount: 120, campaign: 'General Fund', donationDate: '2026-10-01', paymentMethod: 'Mobile Wallet' }
+      ];
+
+      const form = document.getElementById('donationForm');
+      const tableBody = document.getElementById('donationTableBody');
+      const searchInput = document.getElementById('searchInput');
+      const campaignFilter = document.getElementById('campaignFilter');
+      const emptyState = document.getElementById('emptyState');
+
+      function getDonations() {
+        const savedDonations = localStorage.getItem(storageKey);
+        if (!savedDonations) {
+          localStorage.setItem(storageKey, JSON.stringify(defaultDonations));
+          return [...defaultDonations];
+        }
+
+        try {
+          return JSON.parse(savedDonations);
+        } catch (error) {
+          localStorage.setItem(storageKey, JSON.stringify(defaultDonations));
+          return [...defaultDonations];
+        }
+      }
+
+      function saveDonations(donations) {
+        localStorage.setItem(storageKey, JSON.stringify(donations));
+      }
+
+      function formatCurrency(value) {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2
+        }).format(value);
+      }
+
+      function updateSummary(donations) {
+        const total = donations.reduce((sum, item) => sum + Number(item.amount), 0);
+        const donorSet = new Set(donations.map(item => item.email));
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+
+        const monthly = donations.filter(item => {
+          const date = new Date(item.donationDate);
+          return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+        }).reduce((sum, item) => sum + Number(item.amount), 0);
+
+        const largest = donations.reduce((max, item) => {
+          return Number(item.amount) > max ? Number(item.amount) : max;
+        }, 0);
+
+        document.getElementById('totalAmount').textContent = formatCurrency(total);
+        document.getElementById('donorCount').textContent = donorSet.size;
+        document.getElementById('monthlyAmount').textContent = formatCurrency(monthly);
+        document.getElementById('largestGift').textContent = formatCurrency(largest);
+      }
+
+      function getFilteredDonations() {
+        const query = searchInput.value.trim().toLowerCase();
+        const campaign = campaignFilter.value;
+        const donations = getDonations();
+
+        return donations.filter(item => {
+          const matchesCampaign = campaign === 'All' || item.campaign === campaign;
+          const searchable = `${item.donorName} ${item.campaign}`.toLowerCase();
+          const matchesQuery = !query || searchable.includes(query);
+          return matchesCampaign && matchesQuery;
+        });
+      }
+
+      function renderTable() {
+        const donations = getFilteredDonations();
+        tableBody.innerHTML = '';
+
+        if (!donations.length) {
+          emptyState.hidden = false;
+          return;
+        }
+
+        emptyState.hidden = true;
+
+        donations.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.donorName}</td>
+            <td><span class="pill ${item.campaign === 'General Fund' ? 'success' : 'warning'}">${item.campaign}</span></td>
+            <td>${formatCurrency(Number(item.amount))}</td>
+            <td>${new Date(item.donationDate).toLocaleDateString()}</td>
+            <td>${item.paymentMethod}</td>
+            <td><button class="action" data-id="${item.id}">Delete</button></td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
+
+      function renderAll() {
+        const donations = getDonations();
+        updateSummary(donations);
+        renderTable();
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const donations = getDonations();
+        const newDonation = {
+          id: Date.now(),
+          donorName: document.getElementById('donorName').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          amount: Number(document.getElementById('amount').value),
+          campaign: document.getElementById('campaign').value,
+          donationDate: document.getElementById('donationDate').value,
+          paymentMethod: document.getElementById('paymentMethod').value
+        };
+
+        if (!newDonation.donorName || !newDonation.email || !newDonation.amount || !newDonation.donationDate) {
+          alert('Please fill in all required fields.');
+          return;
+        }
+
+        donations.push(newDonation);
+        saveDonations(donations);
+        form.reset();
+        document.getElementById('donationDate').valueAsDate = new Date();
+        renderAll();
+      });
+
+      searchInput.addEventListener('input', renderTable);
+      campaignFilter.addEventListener('change', renderTable);
+
+      tableBody.addEventListener('click', function (event) {
+        const deleteButton = event.target.closest('.action');
+        if (!deleteButton) return;
+
+        const id = Number(deleteButton.dataset.id);
+        let donations = getDonations();
+        donations = donations.filter(item => item.id !== id);
+        saveDonations(donations);
+        renderAll();
+      });
+
+      document.getElementById('donationDate').valueAsDate = new Date();
+      renderAll();
+    </script>
+  </body>
+</html>
